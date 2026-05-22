@@ -1,73 +1,78 @@
-# React + TypeScript + Vite
+# 🎟️ Sistema de Venda de Ingressos (VSSTickets)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Projeto de Engenharia de Software desenvolvido para o Centro Universitário UniRuy Wyden, contemplando o ciclo completo de desenvolvimento: desde o levantamento de requisitos até a implementação e deploy em nuvem.
 
-Currently, two official plugins are available:
+**Disciplina:** Engenharia de Software (2026.1)  
+**Professor:** Msc. Heleno Cardoso  
+**Equipe:**
+- Vítor Silva Santana
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🚀 Tecnologias Utilizadas
+* **Backend:** Node.js
+* **Banco de Dados / BaaS:** Supabase (PostgreSQL)
+* **Frontend:** React.js 
+* **Modelagem:** Draw.io
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 1. Introdução e Objetivos
+Este projeto consiste em uma plataforma completa para a gestão e venda de ingressos (focada em eventos, abadás e camarotes). O sistema permite que promotores de eventos publiquem seus catálogos, acompanhem as vendas em tempo real e realizem a validação de entrada via QR Code. Para o cliente final, a plataforma oferece um ambiente seguro para compra digital com emissão instantânea de ingressos.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 2. Funcionalidades e Requisitos
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Atores do Sistema
+1. **Cliente:** Usuário final que navega pelo catálogo, realiza compras e acessa ingressos.
+2. **Promotor:** Organizador que cadastra eventos, gerencia lotes e valida a entrada.
+3. **Administrador:** Gestor global da plataforma.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### Requisitos Funcionais (RF)
+* **[RF01]** O sistema deve permitir que o Cliente realize cadastro, login e visualize o catálogo de eventos.
+* **[RF02]** O sistema deve permitir que o Cliente compre ingressos e acesse seu ticket digital (QR Code).
+* **[RF03]** O sistema deve permitir que o Promotor cadastre, edite e gerencie eventos e lotes de ingressos (capacidade/preço).
+* **[RF04]** O sistema deve fornecer ao Promotor a funcionalidade de validação de QR Code na portaria do evento.
+* **[RF05]** O sistema deve permitir a solicitação de reembolso por parte do Cliente logado.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Requisitos Não Funcionais (RNF)
+* **[RNF01] Segurança:** Controle de acesso rígido utilizando *Row Level Security (RLS)* do Supabase.
+* **[RNF02] Disponibilidade:** A aplicação deve ser hospedada em ambiente CLOUD com alta disponibilidade.
+* **[RNF03] Concorrência:** O banco de dados deve tratar acessos simultâneos para evitar venda em duplicidade de ingressos de um mesmo lote.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+---
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 3. Modelagem do Banco de Dados (Dicionário de Dados)
+O banco de dados relacional foi estruturado no Supabase (PostgreSQL). Abaixo estão as tabelas principais:
+
+* **`users`**: Gerencia dados de autenticação e perfis de acesso (`cliente`, `promotor`, `admin`).
+* **`event_categories`**: Categorização para facilitar a busca de eventos.
+* **`events`**: Informações do evento (título, datas, local), associado a um `promotor`.
+* **`ticket_batches`**: Controle de lotes, definindo preço e `total_capacity` para evitar superlotação.
+* **`transactions`**: Controle financeiro do carrinho de compras e status de pagamento.
+* **`tickets`**: Ingresso físico/digital individual gerado após a compra aprovada, contendo um `qr_code_hash` único para validação na catraca.
+
+*(Acesse a pasta `/database` neste repositório para visualizar o script SQL completo).*
+
+---
+
+## 4. Diagramas UML
+
+### 4.1. Diagrama de Casos de Uso
+Demonstra a interação dos três atores principais com as funcionalidades do sistema, incluindo fluxos de exceção e obrigatoriedades (`<<include>>` e `<<extend>>`).
+![Diagrama de Casos de Uso](./docs/Diagrama_de_Casos_de_Uso.png)
+![Diagrama de Casos de Uso](./docs/caso_de_uso2.drawio.png)
+### 4.2. Diagrama de Classes
+Estrutura orientada a objetos mapeando as entidades do domínio, seus atributos privados, métodos públicos (ações da API em Node.js) e regras de multiplicidade.
+![Diagrama de Classes](./docs/Diagrama_de_Classes.drawio.png)
+### 4.3. Diagrama de Atividades (Fluxo de Compra)
+Detalha o fluxo transacional do checkout de ingressos, evidenciando as raias de execução entre Frontend, Backend (Node.js), Banco de Dados (Supabase) e Gateway de Pagamento, incluindo a trava de concorrência por lotes esgotados.
+![Diagrama de Atividades](./docs/Diagrama_de_Atividades.drawio.png)
+
+## 5. Processo de Implantação (Deploy)
+* **Banco de Dados:** Instância gerenciada pelo Supabase Cloud.
+* **Backend (API):** Hospedado em [Nome do Serviço Cloud, ex: Render / Railway].
+* **Frontend:** Hospedado em [Nome do Serviço Cloud, ex: Vercel].
+
+O processo de homologação ocorre via chamadas de teste nas rotas da API, garantindo que o tempo de resposta e as restrições de RLS estejam funcionando conforme os RNFs estipulados no projeto.
